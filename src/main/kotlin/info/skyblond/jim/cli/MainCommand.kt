@@ -17,16 +17,14 @@ object MainCommand : CliktCommand() {
             ServerCommand, // HTTP API
             // resources, add, update, delete
             // with sub command entry or meta
-            AddCommand,
+            CreateCommand,
             UpdateCommand,
             DeleteCommand,
             // general search and view
             SearchCommand, // by keyword
             BrowseCommand, // by parent
             ViewCommand, // by entry id
-            // db sync
-            // delete orphan metadata, set unreachable entries' parent to "L_UNREACHABLE"
-            SyncCommand,
+            SyncCommand, // db sync, delete orphan metadata
             // import and export json
             ExportCommand,
             ImportCommand,

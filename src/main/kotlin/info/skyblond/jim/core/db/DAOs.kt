@@ -1,6 +1,5 @@
 package info.skyblond.jim.core.db
 
-import org.eclipse.jetty.webapp.Ordering
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 
