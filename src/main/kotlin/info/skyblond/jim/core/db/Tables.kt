@@ -92,7 +92,7 @@ object Entries : Table("t_entry") {
 /**
  * The metadata of an entry.
  * */
-object Metadatas : Table("t_metadata") {
+object Metas : Table("t_metadata") {
     /**
      * Meta to which entry. Referenced by id.
      *

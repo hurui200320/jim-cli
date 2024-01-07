@@ -4,43 +4,43 @@ import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 
 private fun checkEntryId(entryId: String) {
+    require(entryId.isNotBlank()) { "Entry id must not be blank" }
     require(entryId.uppercase() == entryId) { "Entry id must be uppercase: $entryId" }
     require(entryId.length <= 20) { "Entry id must be no longer than 20 chars: $entryId" }
 }
 
 /**
- * DAO of [Metadatas].
+ * DAO of [Metas].
  *
- * The [entryId] must be uppercase and no longer than 20 chars.
+ * The [entryId], see [Entry.entryId].
  * The [name] can be anything but no longer than 2048 chars.
- * The [type] and [value] follows the description from [Metadatas.Type].
+ * The [type] and [value] follows the description from [Metas.Type].
  * */
-data class Metadata(
+data class Meta(
     val entryId: String,
     val name: String,
-    var type: Metadatas.Type,
-    var value: String
+    var type: Metas.Type,
+    var value: String = ""
 ) {
     init {
-        checkEntryId(entryId)
         require(name.length <= 2048) { "Name must be no longer than 2048 chars: $name" }
     }
 
     fun insert() {
         require(Entry.existsById(entryId)) { "Entry $entryId does not exist" }
-        Metadatas.insert {
-            it[entryId] = this@Metadata.entryId
-            it[name] = this@Metadata.name
-            it[type] = this@Metadata.type
-            it[value] = this@Metadata.value
+        Metas.insert {
+            it[entryId] = this@Meta.entryId
+            it[name] = this@Meta.name
+            it[type] = this@Meta.type
+            it[value] = this@Meta.value
         }
     }
 
     fun update() {
         require(Entry.existsById(entryId)) { "Entry $entryId does not exist" }
-        Metadatas.update({ Entries.entryId eq entryId }) {
-            it[type] = this@Metadata.type
-            it[value] = this@Metadata.value
+        Metas.update({ Metas.entryId eq entryId }) {
+            it[type] = this@Meta.type
+            it[value] = this@Meta.value
         }
     }
 
@@ -52,35 +52,35 @@ data class Metadata(
         ?: error("Database inconsistent: entry $entryId has metadata but no entry record")
 
     companion object {
-        private fun ResultRow.parse() = Metadata(
-            entryId = this[Metadatas.entryId],
-            name = this[Metadatas.name],
-            type = this[Metadatas.type],
-            value = this[Metadatas.value]
+        private fun ResultRow.parse() = Meta(
+            entryId = this[Metas.entryId],
+            name = this[Metas.name],
+            type = this[Metas.type],
+            value = this[Metas.value]
         )
 
         fun existsByIdAndName(entryId: String, name: String) =
-            Metadatas.select {
-                (Metadatas.entryId eq entryId) and (Metadatas.name eq name)
+            Metas.select {
+                (Metas.entryId eq entryId) and (Metas.name eq name)
             }.count() > 0
 
         fun selectByIdAndName(entryId: String, name: String) =
-            Metadatas.select {
-                (Metadatas.entryId eq entryId) and (Metadatas.name eq name)
+            Metas.select {
+                (Metas.entryId eq entryId) and (Metas.name eq name)
             }.firstOrNull()?.parse()
 
         fun deleteByIdAndName(entryId: String, name: String) =
-            Metadatas.deleteWhere {
-                (Metadatas.entryId eq entryId) and (Metadatas.name eq name)
+            Metas.deleteWhere {
+                (Metas.entryId eq entryId) and (Metas.name eq name)
             }
 
         fun selectAllById(entryId: String) =
-            Metadatas.select { Metadatas.entryId eq entryId }
-                .orderBy(Metadatas.entryId)
+            Metas.select { Metas.entryId eq entryId }
+                .orderBy(Metas.entryId)
                 .map { it.parse() }
 
         fun deleteAllById(entryId: String) =
-            Metadatas.deleteWhere { Metadatas.entryId eq entryId }
+            Metas.deleteWhere { Metas.entryId eq entryId }
     }
 }
 
@@ -128,6 +128,7 @@ data class Entry(
             require(existsById(it)) { "Parent entry $entryId does not exist" }
         }
         Entries.update({ Entries.entryId eq entryId }) {
+            it[type] = this@Entry.type
             it[parentEntryId] = this@Entry.parentEntryId
             it[name] = this@Entry.name
             it[note] = this@Entry.note
@@ -138,7 +139,7 @@ data class Entry(
 
     fun delete() {
         // delete all related entry
-        Metadata.deleteAllById(entryId)
+        Meta.deleteAllById(entryId)
         // update all child's parent to our parent
         Entries.update({ Entries.parentEntryId eq entryId }) {
             it[parentEntryId] = this@Entry.parentEntryId
@@ -147,7 +148,7 @@ data class Entry(
         Entries.deleteWhere { Entries.entryId eq this@Entry.entryId }
     }
 
-    fun listMetadata() = Metadata.selectAllById(entryId)
+    fun listMetadata() = Meta.selectAllById(entryId)
 
     companion object {
         private fun ResultRow.parse() = Entry(
@@ -166,15 +167,15 @@ data class Entry(
          * Select all [Entry] which:
          *   + [name] contains [keyword], or
          *   + [note] contains [keyword], or
-         *   + [Metadata.name] contains [keyword], or
-         *   + [Metadata.value] contains [keyword].
+         *   + [Meta.name] contains [keyword], or
+         *   + [Meta.value] contains [keyword].
          * */
         fun selectAllByKeyword(keyword: String) = Entries
-            .join(Metadatas, JoinType.INNER, onColumn = Entries.entryId, otherColumn = Metadatas.entryId)
+            .join(Metas, JoinType.INNER, onColumn = Entries.entryId, otherColumn = Metas.entryId)
             .slice(Entries.columns)
             .select {
                 (Entries.name like "%$keyword%") or (Entries.note like "%$keyword%") or
-                        (Metadatas.name like "%$keyword%") or (Metadatas.value like "%$keyword%")
+                        (Metas.name like "%$keyword%") or (Metas.value like "%$keyword%")
             }
             .orderBy(Entries.entryId)
             .map { it.parse() }
@@ -184,10 +185,10 @@ data class Entry(
          * Select all [Entry] which has metadata with type of tag that having name containing [tagKeyword]
          * */
         fun selectAllByTagKeyword(tagKeyword: String) = Entries
-            .join(Metadatas, JoinType.INNER, onColumn = Entries.entryId, otherColumn = Metadatas.entryId)
+            .join(Metas, JoinType.INNER, onColumn = Entries.entryId, otherColumn = Metas.entryId)
             .slice(Entries.columns)
             .select {
-                (Metadatas.type eq Metadatas.Type.TAG) and (Metadatas.name like "%$tagKeyword%")
+                (Metas.type eq Metas.Type.TAG) and (Metas.name like "%$tagKeyword%")
             }
             .orderBy(Entries.entryId)
             .map { it.parse() }
