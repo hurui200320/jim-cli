@@ -11,7 +11,7 @@ import info.skyblond.jim.core.importDataFromJson
 
 object ImportCommand : CliktCommand(
     name = "import",
-    help = "Import data from json file."
+    help = "Import data from json file"
 ) {
     private val forceOverwrite by option("-f", "--force").flag()
         .help("Overwrite/update existing record, might produce orphan entities")

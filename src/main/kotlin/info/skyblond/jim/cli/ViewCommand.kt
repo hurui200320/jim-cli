@@ -9,7 +9,7 @@ import org.jetbrains.exposed.sql.transactions.transaction
 
 object ViewCommand : CliktCommand(
     name = "view",
-    help = "View the info of a given entry"
+    help = "View details of a given entry"
 ) {
     private val entryId: String by argument("entry_id")
         .check("Entry not found") { transaction { Entry.existsById(it.uppercase()) } }
