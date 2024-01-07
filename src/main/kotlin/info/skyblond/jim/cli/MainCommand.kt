@@ -6,12 +6,7 @@ import com.github.ajalt.clikt.parameters.options.default
 import com.github.ajalt.clikt.parameters.options.help
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.types.file
-import info.skyblond.jim.core.db.Entries
-import info.skyblond.jim.core.db.Metadatas
-import org.jetbrains.exposed.sql.Database
-import org.jetbrains.exposed.sql.SchemaUtils
-import org.jetbrains.exposed.sql.SchemaUtils.withDataBaseLock
-import org.jetbrains.exposed.sql.transactions.transaction
+import info.skyblond.jim.core.connectToSQLite
 import java.io.File
 
 object MainCommand : CliktCommand() {
@@ -45,15 +40,6 @@ object MainCommand : CliktCommand() {
         .help("Database path. Default: $defaultDBFile")
 
     override fun run() {
-        dbFile.parentFile?.mkdirs()
-        Database.connect(
-            "jdbc:sqlite:$dbFile",
-            driver = "org.sqlite.JDBC",
-        )
-        transaction {
-            withDataBaseLock {
-                SchemaUtils.create(Entries, Metadatas)
-            }
-        }
+        connectToSQLite(dbFile)
     }
 }
