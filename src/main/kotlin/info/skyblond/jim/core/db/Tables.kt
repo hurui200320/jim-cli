@@ -129,7 +129,9 @@ object Metas : Table("t_metadata") {
     /**
      * Type of the values.
      * */
-    enum class Type {
+    enum class Type(
+        val needValue: Boolean = true
+    ) {
         /**
          * A tag represents an attribute, like:
          *   + `lithium_battery` to mark an item have a battery inside
@@ -139,7 +141,7 @@ object Metas : Table("t_metadata") {
          *
          * Entries can be filtered by the presence of a given tag.
          * */
-        TAG,
+        TAG(needValue = false),
 
         /**
          * Plain text.

@@ -1,5 +1,6 @@
 package info.skyblond.jim.core.db
 
+import org.eclipse.jetty.webapp.Ordering
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 
@@ -76,7 +77,7 @@ data class Meta(
 
         fun selectAllById(entryId: String) =
             Metas.select { Metas.entryId eq entryId }
-                .orderBy(Metas.entryId)
+                .orderBy(Metas.type to SortOrder.ASC, Metas.entryId to SortOrder.ASC)
                 .map { it.parse() }
 
         fun deleteAllById(entryId: String) =
