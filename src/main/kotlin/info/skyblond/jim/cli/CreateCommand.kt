@@ -39,7 +39,7 @@ object CreateCommand : CliktCommand(
         private val entryId: String
             get() = _entryId.uppercase()
 
-        private val entryType: String? by option(            "--type"        )
+        private val entryType: String? by option("--type")
             .choice(*Entries.Type.entries.map { it.name }.toTypedArray(), ignoreCase = true)
             .help("The entry type, will automatically inferred from entry ID if you follow the naming rule")
 
@@ -62,10 +62,12 @@ object CreateCommand : CliktCommand(
 
         private val multilineNote by option("--multiline-note")
             .flag()
-            .help("Read multiple lines of note from stdin, omit `--note`. " +
-                    "Use ctrl+Z (Windows) or ctrl+D on a new line to send EOF")
+            .help(
+                "Read multiple lines of note from stdin, omit `--note`. " +
+                        "Use ctrl+Z (Windows) or ctrl+D on a new line to send EOF"
+            )
 
-        override fun run() {
+        override fun run() = displayWhenError {
             val actualNote = if (multilineNote) {
                 echo("Type your note: ", trailingNewline = false)
                 val sb = StringBuilder()
@@ -87,7 +89,7 @@ object CreateCommand : CliktCommand(
                             'I' -> Entries.Type.ITEM
                             else -> throw IllegalArgumentException("Cannot infer type from entry id: $entryId")
                         },
-                    parentEntryId = parentId,
+                    parentEntryId = parentId?.uppercase(),
                     name = name,
                     note = actualNote
                 )
@@ -131,8 +133,10 @@ object CreateCommand : CliktCommand(
 
         private val multilineValue by option("--multiline-value")
             .flag()
-            .help("Read multiple lines of value from stdin, omit `--value`. " +
-                    "Use ctrl+Z (Windows) or ctrl+D on a new line to send EOF")
+            .help(
+                "Read multiple lines of value from stdin, omit `--value`. " +
+                        "Use ctrl+Z (Windows) or ctrl+D on a new line to send EOF"
+            )
 
 
         override fun run() {

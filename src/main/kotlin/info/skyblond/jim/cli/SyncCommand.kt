@@ -1,6 +1,7 @@
 package info.skyblond.jim.cli
 
 import com.github.ajalt.clikt.core.CliktCommand
+import com.github.ajalt.clikt.core.terminal
 import info.skyblond.jim.core.db.Entries
 import info.skyblond.jim.core.db.Entry
 import info.skyblond.jim.core.db.Metas
@@ -50,7 +51,7 @@ object SyncCommand : CliktCommand(
                     echo(Entry.selectById(entryId)!!.prettyString("    "))
                 }
             } catch (t: Throwable) {
-                echo("Failed to fetch and print entry $entryId", err = true)
+                echoErr("Failed to fetch and print entry $entryId")
             }
         }
 

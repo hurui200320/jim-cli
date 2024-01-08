@@ -110,10 +110,24 @@ data class Entry(
         require(name.length <= 2048) { "Name must be no longer than 2048 chars: $name" }
     }
 
-    fun insert() {
-        parentEntryId?.let {
-            require(existsById(it)) { "Parent entry $entryId does not exist" }
+    private fun checkParent() = parentEntryId?.let {
+        val parent = selectById(it)
+        require(parent != null) { "Parent entry $it does not exist" }
+        when (type) {
+            // location can only have location as parent
+            Entries.Type.LOCATION -> require(parent.type in listOf(Entries.Type.LOCATION))
+            // box and item can have location and box as parent
+            Entries.Type.BOX, Entries.Type.ITEM -> require(
+                parent.type in listOf(
+                    Entries.Type.LOCATION,
+                    Entries.Type.BOX
+                )
+            ) { "Entry type $type cannot have ${parent.type} as parent" }
         }
+    }
+
+    fun insert() {
+        checkParent()
         Entries.insert {
             it[entryId] = this@Entry.entryId
             it[type] = this@Entry.type
@@ -124,9 +138,7 @@ data class Entry(
     }
 
     fun update() {
-        parentEntryId?.let {
-            require(existsById(it)) { "Parent entry $entryId does not exist" }
-        }
+        checkParent()
         Entries.update({ Entries.entryId eq entryId }) {
             it[type] = this@Entry.type
             it[parentEntryId] = this@Entry.parentEntryId
