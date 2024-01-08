@@ -24,7 +24,7 @@ fun connectToSQLite(dbFile: File): Database {
     return db
 }
 
-fun Meta.prettyString(indent: String): String {
+fun Meta.prettyString(indent: String = ""): String {
     val sb = StringBuilder()
     sb.append(indent).append("$type: $name").appendLine()
     if (type.needValue){
