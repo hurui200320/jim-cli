@@ -117,7 +117,7 @@ object CreateCommand : CliktCommand(
 
         private val name: String by option("--name")
             .required()
-            .help("The name of entry")
+            .help("The name of metadata")
             .check("Meta duplicate on name") {
                 transaction { !Meta.existsByIdAndName(entryId, it) }
             }
@@ -129,7 +129,7 @@ object CreateCommand : CliktCommand(
 
         private val value: String by option("--value")
             .default("")
-            .help("The value of meta, optional depends on type")
+            .help("The value of metadata, optional depends on type")
 
         private val multilineValue by option("--multiline-value")
             .flag()
@@ -139,7 +139,7 @@ object CreateCommand : CliktCommand(
             )
 
 
-        override fun run() {
+        override fun run() = displayWhenError {
             val actualValue = if (multilineValue) {
                 echo("Type your value: ", trailingNewline = false)
                 val sb = StringBuilder()
