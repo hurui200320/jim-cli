@@ -209,5 +209,9 @@ data class Entry(
             .select { Entries.parentEntryId eq parentEntryId }
             .orderBy(Entries.entryId)
             .map { it.parse() }
+
+        fun countByParentEntryId(parentEntryId: String?) = Entries
+            .select { Entries.parentEntryId eq parentEntryId }
+            .count()
     }
 }

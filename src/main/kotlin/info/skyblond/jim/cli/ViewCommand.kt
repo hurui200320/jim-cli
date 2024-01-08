@@ -17,7 +17,7 @@ object ViewCommand : CliktCommand(
     override fun run() {
         transaction {
             Entry.selectById(entryId.uppercase()) ?: error("Entry found but not found")
-        }.prettyString().also { echo(it) }
+        }.also { echo(it.prettyString()) }
     }
 
 }

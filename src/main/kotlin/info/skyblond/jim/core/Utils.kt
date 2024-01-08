@@ -43,6 +43,9 @@ fun Entry.prettyString(indent: String = ""): String {
     parentEntryId?.let {
         sb.append(indent).append("\tIN: $it").appendLine()
     }
+    Entry.countByParentEntryId(entryId).let {
+        if (it != 0L) sb.append(indent).append("\tChildren count: $it").appendLine()
+    }
     sb.append(indent).append("\tName: $name").appendLine()
     sb.append(indent).append("\tNote: ")
     note.lines().forEachIndexed { index, s ->
