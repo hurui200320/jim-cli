@@ -32,15 +32,15 @@ data class Meta(
             it[entryId] = this@Meta.entryId
             it[name] = this@Meta.name
             it[type] = this@Meta.type
-            it[value] = this@Meta.value
+            it[value] = if (this@Meta.type.needValue) this@Meta.value else ""
         }
     }
 
     fun update() {
         require(Entry.existsById(entryId)) { "Entry $entryId does not exist" }
-        Metas.update({ Metas.entryId eq entryId }) {
+        Metas.update({ (Metas.entryId eq entryId) and (Metas.name eq name) }) {
             it[type] = this@Meta.type
-            it[value] = this@Meta.value
+            it[value] = if (this@Meta.type.needValue) this@Meta.value else ""
         }
     }
 

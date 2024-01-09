@@ -27,10 +27,10 @@ fun connectToSQLite(dbFile: File): Database {
 fun Meta.prettyString(indent: String = ""): String {
     val sb = StringBuilder()
     sb.append(indent).append("$type: $name").appendLine()
-    if (type.needValue){
+    if (type.needValue) {
         sb.append(indent).append("\tValue: ")
         value.lines().forEachIndexed { index, s ->
-            if (index != 0 ) sb.append(indent).append("\t     | ")
+            if (index != 0) sb.append(indent).append("\t     | ")
             sb.append(s).appendLine()
         }
     }
@@ -43,17 +43,17 @@ fun Entry.prettyString(indent: String = ""): String {
     parentEntryId?.let {
         sb.append(indent).append("\tIN: $it").appendLine()
     }
-    Entry.countByParentEntryId(entryId).let {
+    transaction { Entry.countByParentEntryId(entryId) }.let {
         if (it != 0L) sb.append(indent).append("\tChildren count: $it").appendLine()
     }
     sb.append(indent).append("\tName: $name").appendLine()
     sb.append(indent).append("\tNote: ")
     note.lines().forEachIndexed { index, s ->
-        if (index != 0 ) sb.append(indent).append("\t    | ")
+        if (index != 0) sb.append(indent).append("\t    | ")
         sb.append(s).appendLine()
     }
     val metadataList = transaction { listMetadata() }
-    if (metadataList.isNotEmpty()){
+    if (metadataList.isNotEmpty()) {
         sb.append(indent).append("\tMetadata:").appendLine()
         metadataList.forEach { meta ->
             sb.append(meta.prettyString("$indent\t\t"))
