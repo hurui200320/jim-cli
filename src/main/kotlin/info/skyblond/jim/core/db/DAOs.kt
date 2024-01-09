@@ -177,19 +177,29 @@ data class Entry(
 
         /**
          * Select all [Entry] which:
+         *   + [entryId] contains [keyword], or
+         *   + [parentEntryId] contains [keyword], or
          *   + [name] contains [keyword], or
          *   + [note] contains [keyword], or
          *   + [Meta.name] contains [keyword], or
          *   + [Meta.value] contains [keyword].
+         *
+         * Case-insensitive.
          * */
         fun selectAllByKeyword(keyword: String) = Entries
-            .join(Metas, JoinType.INNER, onColumn = Entries.entryId, otherColumn = Metas.entryId)
+            .join(Metas, JoinType.LEFT, onColumn = Entries.entryId, otherColumn = Metas.entryId)
             .slice(Entries.columns)
             .select {
-                (Entries.name like "%$keyword%") or (Entries.note like "%$keyword%") or
-                        (Metas.name like "%$keyword%") or (Metas.value like "%$keyword%")
+                val k = "%$keyword%".lowercase()
+                (Entries.entryId.lowerCase() like k) or
+                (Entries.parentEntryId.lowerCase() like k) or
+                (Entries.name.lowerCase() like k) or
+                        (Entries.note.lowerCase() like k) or
+                        (Metas.name.lowerCase() like k) or
+                        (Metas.value.lowerCase() like k)
             }
             .orderBy(Entries.entryId)
+            .asSequence()
             .map { it.parse() }
 
 
