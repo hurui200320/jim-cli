@@ -95,12 +95,7 @@ data class Meta(
  * */
 data class Entry(
     val entryId: String,
-    val type: Entries.Type = when (entryId.first()) {
-        'L' -> Entries.Type.LOCATION
-        'B' -> Entries.Type.BOX
-        'I' -> Entries.Type.ITEM
-        else -> throw IllegalArgumentException("Cannot infer type from entry id: $entryId")
-    },
+    val type: Entries.Type = inferType(entryId),
     var parentEntryId: String? = null,
     var name: String = "",
     var note: String = "",
@@ -163,6 +158,14 @@ data class Entry(
     fun listMetadata() = Meta.selectAllById(entryId)
 
     companion object {
+
+        fun inferType(entryId: String) = when (entryId.first()) {
+            'L' -> Entries.Type.LOCATION
+            'B' -> Entries.Type.BOX
+            'I' -> Entries.Type.ITEM
+            else -> throw IllegalArgumentException("Cannot infer type from entry id: $entryId")
+        }
+
         private fun ResultRow.parse() = Entry(
             entryId = this[Entries.entryId],
             type = this[Entries.type],

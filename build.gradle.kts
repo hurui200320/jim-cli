@@ -24,6 +24,8 @@ dependencies {
     implementation("com.google.code.gson:gson:2.10.1")
     // javalin for http service
     implementation("io.javalin:javalin:5.6.3")
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.16.1")
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.16.1")
 
     testImplementation("org.jetbrains.kotlin:kotlin-test")
 }
@@ -32,7 +34,7 @@ tasks.test {
     useJUnitPlatform()
 }
 kotlin {
-    jvmToolchain(21)
+    jvmToolchain(17)
 }
 
 application {

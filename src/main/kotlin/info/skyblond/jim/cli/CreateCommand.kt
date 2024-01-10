@@ -80,12 +80,7 @@ object CreateCommand : CliktCommand(
                 val e = Entry(
                     entryId = entryId,
                     type = entryType?.let { Entries.Type.valueOf(it) }
-                        ?: when (entryId.first()) {
-                            'L' -> Entries.Type.LOCATION
-                            'B' -> Entries.Type.BOX
-                            'I' -> Entries.Type.ITEM
-                            else -> throw IllegalArgumentException("Cannot infer type from entry id: $entryId")
-                        },
+                        ?: Entry.inferType(entryId),
                     parentEntryId = parentId?.uppercase(),
                     name = name,
                     note = actualNote
