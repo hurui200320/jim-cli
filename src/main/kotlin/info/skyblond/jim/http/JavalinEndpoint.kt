@@ -1,8 +1,6 @@
 package info.skyblond.jim.http
 
-import info.skyblond.jim.http.handler.handleBrowse
-import info.skyblond.jim.http.handler.handleSearch
-import info.skyblond.jim.http.handler.handleView
+import info.skyblond.jim.http.handler.*
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.javalin.Javalin
 import io.javalin.http.BadRequestResponse
@@ -65,11 +63,11 @@ fun Javalin.registerEndPoint(key: SecretKey, debug: Boolean): Javalin = this.app
 private fun handleReq(command: String, params: List<*>): Any? = when (command) {
     "browse" -> handleBrowse(params)
     "create_entry" -> handleCreateEntry(params)
-    "create_meta" -> handleCreateEntry(params)
+    "create_meta" -> handleCreateMeta(params)
     "delete_entry" -> handleDeleteEntry(params)
-    "delete_meta" -> handleDeleteEntry(params)
+    "delete_meta" -> handleDeleteMeta(params)
     "update_entry" -> handleUpdateEntry(params)
-    "update_meta" -> handleUpdateEntry(params)
+    "update_meta" -> handleUpdateMeta(params)
     "search" -> handleSearch(params)
     "view" -> handleView(params)
     else -> throw BadRequestResponse("Unknown command")
