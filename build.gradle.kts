@@ -24,8 +24,6 @@ dependencies {
     implementation("com.google.code.gson:gson:2.10.1")
     // javalin for http service
     implementation("io.javalin:javalin:5.6.3")
-    // laterna for tui
-    implementation("com.googlecode.lanterna:lanterna:3.1.1")
 
     testImplementation("org.jetbrains.kotlin:kotlin-test")
 }

@@ -13,7 +13,6 @@ object MainCommand : CliktCommand() {
 
     init {
         subcommands(
-            TUICommand, // TUI
             ServerCommand, // HTTP API
             // resources, add, update, delete
             // with sub command entry or meta
