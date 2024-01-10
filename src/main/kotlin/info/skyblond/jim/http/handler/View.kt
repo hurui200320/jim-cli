@@ -11,8 +11,8 @@ import org.jetbrains.exposed.sql.transactions.transaction
  * @see [info.skyblond.jim.cli.ViewCommand].
  * */
 fun handleView(params: List<*>): EntryModel {
-    val entryId = params.castParam(0, String::class)
+    val entryId = params.castParam(0, String::class).uppercase()
     return transaction {
-        Entry.selectById(entryId.uppercase())
+        Entry.selectById(entryId)
     }?.toModel() ?: error("Entry not found")
 }

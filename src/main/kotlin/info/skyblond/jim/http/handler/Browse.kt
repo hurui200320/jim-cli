@@ -9,8 +9,8 @@ import org.jetbrains.exposed.sql.transactions.transaction
  * @see [info.skyblond.jim.cli.BrowseCommand].
  * */
 fun handleBrowse(params: List<*>): List<String> {
-    val parentId = params.castParamNullable(0, String::class)
+    val parentId = params.castParamNullable(0, String::class)?.uppercase()
     return transaction {
-        Entry.selectAllByParentEntryId(parentId?.uppercase())
+        Entry.selectAllByParentEntryId(parentId)
     }.map { it.entryId }
 }

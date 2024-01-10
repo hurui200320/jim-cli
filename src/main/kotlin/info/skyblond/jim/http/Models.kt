@@ -69,7 +69,7 @@ data class EntryModel(
     companion object {
         fun Entry.toModel(): EntryModel = EntryModel(
             entryId = this@toModel.entryId,
-            entryType = this@toModel.name,
+            entryType = this@toModel.type.name,
             parentId = this@toModel.parentEntryId,
             name = this@toModel.name,
             note = this@toModel.note,

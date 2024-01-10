@@ -60,14 +60,14 @@ fun Javalin.registerEndPoint(key: SecretKey, debug: Boolean): Javalin = this.app
 
 // command is always lowercase, use `_` instead of space
 // same as cli command
-private fun handleReq(command: String, params: List<*>): Any? = when (command) {
+private fun handleReq(command: String, params: List<*>): Any = when (command) {
     "browse" -> handleBrowse(params)
     "create_entry" -> handleCreateEntry(params)
     "create_meta" -> handleCreateMeta(params)
     "delete_entry" -> handleDeleteEntry(params)
-    "delete_meta" -> handleDeleteMeta(params)
     "update_entry" -> handleUpdateEntry(params)
     "update_meta" -> handleUpdateMeta(params)
+    "delete_meta" ->  handleDeleteMeta(params)
     "search" -> handleSearch(params)
     "view" -> handleView(params)
     else -> throw BadRequestResponse("Unknown command")
