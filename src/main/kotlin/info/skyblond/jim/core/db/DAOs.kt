@@ -158,7 +158,6 @@ data class Entry(
     fun listMetadata() = Meta.selectAllById(entryId)
 
     companion object {
-
         fun inferType(entryId: String) = when (entryId.first()) {
             'L' -> Entries.Type.LOCATION
             'B' -> Entries.Type.BOX
@@ -186,7 +185,6 @@ data class Entry(
          *   + [note] contains [keyword], or
          *   + [Meta.name] contains [keyword], or
          *   + [Meta.value] contains [keyword].
-         *
          * Case-insensitive.
          * */
         fun selectAllByKeyword(keyword: String) = Entries
@@ -203,19 +201,6 @@ data class Entry(
             }
             .orderBy(Entries.entryId)
             .asSequence()
-            .map { it.parse() }
-
-
-        /**
-         * Select all [Entry] which has metadata with type of tag that having name containing [tagKeyword]
-         * */
-        fun selectAllByTagKeyword(tagKeyword: String) = Entries
-            .join(Metas, JoinType.INNER, onColumn = Entries.entryId, otherColumn = Metas.entryId)
-            .slice(Entries.columns)
-            .select {
-                (Metas.type eq Metas.Type.TAG) and (Metas.name like "%$tagKeyword%")
-            }
-            .orderBy(Entries.entryId)
             .map { it.parse() }
 
         fun selectAllByParentEntryId(parentEntryId: String?) = Entries
