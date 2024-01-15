@@ -120,6 +120,17 @@ When encrypting, json text is encoded using UTF-8 charset. I think it's common k
 
 See [http.mc](./http.md) for detailed endpoint info.
 
+# Performance note
+
+Currently all database request are not pageable, and is parsed to object before return
+the result to caller.
+This will consume a lot of RAM, but with the amount of data I assume I will put
+into the system (shortly speaking, not a lot), it shouldn't be a problem.
+
+But with more and more data coming in, the RAM usage and processing time might
+be user sensible and causing problem.
+At then, the program will require a rewriting with handling pageable data in mind.
+
 # License
 
 As it's my personal project, it's AGPLv3.
