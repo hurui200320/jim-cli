@@ -1,6 +1,7 @@
 package info.skyblond.jim.http
 
 import org.junit.jupiter.api.Test
+import java.util.*
 import javax.crypto.spec.SecretKeySpec
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -22,5 +23,15 @@ class CryptoTest {
         val cipher = key.encrypt(message.toByteArray())
         val plain = key.decrypt(cipher).decodeToString()
         assertEquals(message, plain)
+    }
+
+    @Test
+    fun `test encryption ground`() {
+        val password = "Hello, 你好"
+        val plain = "This is a test. 这是一段测试。"
+
+        val key = sha256KeyGen(password)
+        val encrypted = key.encrypt(plain.toByteArray())
+        println(Base64.getEncoder().encodeToString(encrypted))
     }
 }

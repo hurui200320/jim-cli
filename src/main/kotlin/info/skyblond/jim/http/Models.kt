@@ -9,6 +9,8 @@ import org.jetbrains.exposed.sql.transactions.transaction
 data class JimRequest(
     @JsonProperty("request_id")
     val requestId: String,
+    @JsonProperty("timestamp")
+    val timestamp: Long,
     @JsonProperty("cmd")
     val command: String,
     @JsonProperty("params")

@@ -12,6 +12,7 @@ import io.javalin.json.jsonMapper
 import org.slf4j.LoggerFactory
 import java.lang.reflect.Type
 import javax.crypto.SecretKey
+import kotlin.math.absoluteValue
 
 private val logger = KotlinLogging.logger("info.skyblond.jim.http.Endpoint")
 private fun Context.reqFromJson(string: String): JimRequest =
@@ -46,6 +47,8 @@ fun Javalin.registerEndPoint(key: SecretKey, debug: Boolean): Javalin = this.app
     post("/") { ctx ->
         val req = ctx.decryptReq(key, debug)
             ?: throw BadRequestResponse("Can't decode request")
+        val timeDelta = (req.timestamp - System.currentTimeMillis() / 1000).absoluteValue
+        if (timeDelta > 30) throw BadRequestResponse("Time not match")
 
         val r = runCatching {
             handleReq(req.command.lowercase(), req.params)
@@ -71,7 +74,7 @@ private fun handleReq(command: String, params: List<*>): Any = when (command) {
     "create_entry" -> handleCreateEntry(params)
     "create_meta" -> handleCreateMeta(params)
     "delete_entry" -> handleDeleteEntry(params)
-    "delete_meta" ->  handleDeleteMeta(params)
+    "delete_meta" -> handleDeleteMeta(params)
     "update_entry" -> handleUpdateEntry(params)
     "update_meta" -> handleUpdateMeta(params)
     "search" -> handleSearch(params)

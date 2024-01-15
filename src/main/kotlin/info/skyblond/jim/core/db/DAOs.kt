@@ -27,6 +27,7 @@ data class Meta(
     }
 
     fun insert() {
+        require(name.isNotBlank()) { "Name must not be blank" }
         require(Entry.existsById(entryId)) { "Entry $entryId does not exist" }
         Metas.insert {
             it[entryId] = this@Meta.entryId
@@ -37,6 +38,7 @@ data class Meta(
     }
 
     fun update() {
+        require(name.isNotBlank()) { "Name must not be blank" }
         require(Entry.existsById(entryId)) { "Entry $entryId does not exist" }
         Metas.update({ (Metas.entryId eq entryId) and (Metas.name eq name) }) {
             it[type] = this@Meta.type
