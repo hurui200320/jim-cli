@@ -4,10 +4,7 @@ import ch.qos.logback.classic.Logger
 import info.skyblond.jim.http.handler.*
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.javalin.Javalin
-import io.javalin.http.BadRequestResponse
-import io.javalin.http.ContentType
-import io.javalin.http.Context
-import io.javalin.http.InternalServerErrorResponse
+import io.javalin.http.*
 import io.javalin.json.jsonMapper
 import org.slf4j.LoggerFactory
 import java.lang.reflect.Type
@@ -46,24 +43,39 @@ fun Javalin.registerEndPoint(key: SecretKey, debug: Boolean): Javalin = this.app
     // and AES/GCM/NoPadding to encrypt the body
     post("/") { ctx ->
         val req = ctx.decryptReq(key, debug)
-            ?: throw BadRequestResponse("Can't decode request")
-        val timeDelta = (req.timestamp - System.currentTimeMillis() / 1000).absoluteValue
-        if (timeDelta > 30) throw BadRequestResponse("Time not match")
 
-        val r = runCatching {
-            handleReq(req.command.lowercase(), req.params)
-        }.onFailure { logger.debug(it) { "Failed to process request $req" } }
-
-        val resp = if (r.isSuccess) {
-            respOk(req.requestId, r.getOrNull())
-        } else {
-            respErr(req.requestId, r.exceptionOrNull()!!.message ?: "Unknown error")
+        if (req == null) {
+            ctx.status(HttpStatus.BAD_REQUEST)
+            ctx.contentType(ContentType.APPLICATION_JSON)
+            ctx.result(
+                ctx.respToJson(respErr("", "Can't decode request"))
+            )
+            return@post
         }
 
-        ctx.result(
-            ctx.encryptResp(key, debug, resp)
-                ?: throw InternalServerErrorResponse("Cannot generate response")
-        )
+        try {
+            val timeDelta = (req.timestamp - System.currentTimeMillis() / 1000).absoluteValue
+            if (timeDelta > 30) throw BadRequestResponse("Time not match")
+
+            val r = runCatching {
+                handleReq(req.command.lowercase(), req.params)
+            }.onFailure { logger.debug(it) { "Failed to process request $req" } }
+
+            val resp = if (r.isSuccess) {
+                respOk(req.requestId, r.getOrNull())
+            } else {
+                respErr(req.requestId, r.exceptionOrNull()!!.message ?: "Unknown error")
+            }
+
+            ctx.result(
+                ctx.encryptResp(key, debug, resp)
+                    ?: throw InternalServerErrorResponse("Cannot generate response")
+            )
+        } catch (e: HttpResponseException) {
+            ctx.status(e.status)
+            ctx.contentType(ContentType.APPLICATION_JSON)
+            ctx.result(ctx.respToJson(respErr(req.requestId, e.message ?: "Unknown error")))
+        }
     }
 }
 
