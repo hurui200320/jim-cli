@@ -108,6 +108,7 @@ data class Entry(
     }
 
     private fun checkParent() = parentEntryId?.let {
+        require(it != entryId) {"Parent cannot be entry itself"}
         val parent = selectById(it)
         require(parent != null) { "Parent entry $it does not exist" }
         when (type) {

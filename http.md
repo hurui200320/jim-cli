@@ -234,7 +234,7 @@ Field name and value:
 + `type`: non-null string, must be `TAG` or `TEXT`
 + `value`: non-null string, can be empty
 
-Returns: the related Entry including the newly updated metadata
+Returns: newly updated metadata
 
 Note: when set type to those doesn't need value, the `value` field will be reset to empty.
 The value will be lost forever.
